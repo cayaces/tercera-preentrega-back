@@ -1,17 +1,42 @@
+import addUser from "../services/UserService.js"
+import UserService from "../services/UserService.js";
+
+export async function toggleUserRole(req, res) {
+    try {
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).send("Se requiere un ID de usuario válido");
+        }
+
+        const userService = new UserService();
+        const updatedUser = await userService.toggleUserRole(userId);
+        if (!updatedUser) {
+            return res.status(404).send("Usuario no encontrado o no se pudo cambiar el rol");
+        }
+
+        res.status(200).json({ message: 'Rol del usuario cambiado exitosamente', user: updatedUser });
+    } catch (error) {
+        console.error("Error al cambiar el rol del usuario en el controlador:", error);
+        res.status(500).json({ error: 'Error al cambiar el rol del usuario' });
+    }
+}
+
 export async function registerUser(req, res) {
 
     try {
         console.log("Registering user...");
-        const { name, surname, email, password, role } = req.body;
+        const { name, email, password, role } = req.body;
 
-        if (!name || !surname || !email || !password || !role) {
+        if (!name || !email || !password || !role) {
             console.log("Faltan datos");
             res.status(400).send("Faltan datos");
         }
+        const newUser = await addUser({ name, email, password, role });
 
         res.redirect("/login");
-    } catch (error) { res.status(500).send("Error al registrar usuario: " + error.message); }
-
+    } catch (error) {
+        res.status(500).send("Error al registrar usuario: " + error.message);
+    }
 }
 
 export async function loginUser(req, res) {
@@ -26,7 +51,7 @@ export async function loginUser(req, res) {
             req.session.age = user.age;
             req.session.user = user;
             res.redirect("/api/users/profile")
-            
+
         } else {
             req.session.email = user.email
             req.session.role = user.role
@@ -62,7 +87,7 @@ export async function handleGitHubCallback(req, res) {
         req.session.role = req.user.role;
 
         res.redirect("/api/users/profile");
-        
+
     } catch (error) {
         res.status(500).json("Autenticacion erronea de GitHub");
     }

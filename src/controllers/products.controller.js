@@ -1,4 +1,7 @@
+import productModel from '../dao/mongo/product.model.js';
 import ProductService from '../services/ProductService.js';
+import UserService from '../services/UserService.js';
+
 const productService = new ProductService();
 
 export async function getProducts(req, res) {
@@ -23,22 +26,20 @@ export async function getProducts(req, res) {
             title: "Pre Entrega tres",
             products: allProducts,
             user: userData
-
-        })
+        });
 
     } catch (error) {
         console.error('Error al obtener los productos:', error);
         res.status(500).json({ error: 'Error al obtener los productos' });
     }
+
 }
 
-
 export async function getProductById(req, res) {
-    
+
     try {
         const prodId = req.params.pid;
         const prod = await productService.getProductById(prodId);
-
         if (!prod) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
@@ -47,72 +48,66 @@ export async function getProductById(req, res) {
         res.render("prod", {
             title: "Detalle de Producto",
             product: productDetail
-        })
+        });
 
     } catch (error) {
         console.error('Error al obtener el producto:', error);
         res.status(500).json({ error: 'Error al obtener el producto' });
     }
+
 }
 
 export async function createProduct(req, res) {
 
     try {
-        let { name, description, price, category, stock, thumbnail } = req.body;
-        console.log("El body es:", req.body)
+        const { name, description, price } = req.body;
+        const { user } = req
 
-        if (!name || !description || !price || !category || !stock || !thumbnail) {
-            return res.send({ status: "error", error: "Valor incorrecto" })
-        }
-
-        let result = await productService.addProduct({
+        const newProduct = await ProductService.createProduct({
             name,
             description,
             price,
-            category,
-            stock,
-            thumbnail
-        })
+            owner: user,
+            userEmail: user ? user.email : null 
+        });
 
-        res.send({ result: "success", payload: result })
+        const owner = user ? user._id : 'admin';
 
+        res.status(201).json(newProduct);
     } catch (error) {
-        console.error('Error al crear el producto:', error);
-        res.status(500).json({ error: 'Error al crear el producto' });
+        res.status(500).json({ message: 'Error al crear el producto.' });
     }
+
 }
 
 
 export async function updateProduct(req, res) {
 
     try {
+        const { productId } = req.params;
+        const updatedProduct = req.body;
+        const { user } = req;
 
-        let { pid } = req.params;
-        let productToReplace = req.body;
+        const updated = await ProductService.updateProduct(productId, updatedProduct, user);
 
-        if (!productToReplace.name || !productToReplace.description || !productToReplace.price || !productToReplace.category || !productToReplace.stock || !productToReplace.thumbnail) {
-            return res.send({ status: "error", error: "Valor incompleto" })
-        }
-
-        let result = await productService.updateProduct(pid, productToReplace);
-        res.send({ result: "success", payload: result })
-        
+        res.json(updated);
     } catch (error) {
-        console.error('Error al actualizar el producto:', error);
-        res.status(500).json({ error: 'Error al actualizar el producto' });
+        res.status(500).json({ message: 'Error al actualizar el producto' });
     }
 }
 
 export async function deleteProduct(req, res) {
 
     try {
-        let { pid } = req.params;
-        let result = await productService.deleteProduct(pid);
-        res.send({ result: "success", payload: result })
+       
+        const { productId } = req.params;
+        const { user } = req;
+        const deleted = await ProductService.deleteProduct(productId, user);
+
+        res.json(deleted);
 
     } catch (error) {
-        console.error('Error al eliminar el producto:', error);
-        res.status(500).json({ error: 'Error al eliminar el producto' });
+        res.status(500).json({ message: 'Error al eliminar el producto.' });
     }
 }
 

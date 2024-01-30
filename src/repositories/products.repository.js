@@ -1,15 +1,19 @@
-import productModel from "../dao/mongo/product.model.js";
+import ProductModel from "../dao/mongo/product.model.js";
 import mongoose from "mongoose";
 
-class ProductRepository extends productModel {
-    constructor() {
-        super();
+class ProductRepository {
+    async getProducts(limit) {
+
+        let productsOld = await this.readProducts()
+        if (!limit) return productsOld
+        if (productsOld.length === 0) return "No se encontraron productos que cumplan con el criterio"
+        if (productsOld && limit) return productsOld.slice(0, limit)
     }
 
     readProducts = async () => {
 
         try {
-            const products = await productModel.find({});
+            const products = await ProductModel.find({});
             return products;
 
         } catch (error) {
@@ -18,18 +22,11 @@ class ProductRepository extends productModel {
         }
     }
 
-    getProducts = async (limit) => {
-
-        let productsOld = await this.readProducts()
-        if (!limit) return productsOld
-        if (productsOld.length === 0) return "No se encontraron productos que cumplan con el criterio"
-        if (productsOld && limit) return productsOld.slice(0, limit)
-    }
-
+   
     addProduct = async (product) => {
 
         try {
-            const newProduct = new productModel(product);
+            const newProduct = new ProductModel(product);
             await newProduct.save();
             return newProduct;
 
@@ -39,14 +36,13 @@ class ProductRepository extends productModel {
         }
     }
 
-
-    getProductById = async (productId) => {
+    async getProductById(productId) {
         try {
             if (!mongoose.Types.ObjectId.isValid(productId)) {
                 return null;
             }
 
-            const product = await productModel.findById(productId);
+            const product = await ProductModel.findById(productId);
             if (!product) {
                 return null;
             }
@@ -60,7 +56,7 @@ class ProductRepository extends productModel {
 
     updateProduct = async (id, product) => {
         try {
-            const updatedProduct = await productModel.findOneAndUpdate({ _id: id }, product, { new: true });
+            const updatedProduct = await ProductModel.findOneAndUpdate({ _id: id }, product, { new: true });
             if (updatedProduct) {
                 return { updatedProduct, message: "Producto actualizado" };
             } else {
@@ -75,7 +71,7 @@ class ProductRepository extends productModel {
 
     deleteProduct = async (productId) => {
         try {
-            const deletedProduct = await productModel.findByIdAndDelete(productId);
+            const deletedProduct = await ProductModel.findByIdAndDelete(productId);
             return deletedProduct;
 
         } catch (error) {
@@ -86,7 +82,7 @@ class ProductRepository extends productModel {
 
     getProductByLimit = async (limit) => {
         try {
-            const products = await productModel.find().limit(limit);
+            const products = await ProductModel.find().limit(limit);
             return products;
 
         } catch (error) {
@@ -97,7 +93,7 @@ class ProductRepository extends productModel {
 
     getProductByPage = async (page, productsPerPage) => {
         try {
-            const products = await productModel.find().skip((page - 1) * productsPerPage).limit(productsPerPage);
+            const products = await ProductModel.find().skip((page - 1) * productsPerPage).limit(productsPerPage);
             return products;
 
         } catch (error) {
@@ -108,7 +104,7 @@ class ProductRepository extends productModel {
 
     getProductByQuery = async (query) => {
         try {
-            const products = await productModel.find({
+            const products = await ProductModel.find({
                 description: { $regex: query, $options: 'i' }
             });
             return products
@@ -139,13 +135,13 @@ class ProductRepository extends productModel {
             if (availability != "") {
                 filter.availability = availability;
             }
-            const query = productModel.find(filter)
+            const query = ProductModel.find(filter)
                 .skip(startIndex)
                 .limit(limit)
-                .sort(sortOptions);;
+                .sort(sortOptions);
             const products = await query.exec();
 
-            const totalProducts = await productModel.countDocuments(filter);
+            const totalProducts = await ProductModel.countDocuments(filter);
             const totalPages = Math.ceil(totalProducts / limit);
             const hasPrevPage = startIndex > 0;
             const hasNextPage = endIndex < totalProducts;
@@ -172,7 +168,7 @@ class ProductRepository extends productModel {
 
     existProducts = async (id) => {
         try {
-            const product = await productModel.findById(id);
+            const product = await ProductModel.findById(id);
             if (!product) {
                 return null;
             }

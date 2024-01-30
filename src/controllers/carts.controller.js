@@ -1,6 +1,6 @@
 import CartService from '../services/CartService.js';
-const cartService = new CartService();
 
+const cartService = new CartService();
 
 export async function getCarts(req, res) {
     try {
@@ -11,7 +11,6 @@ export async function getCarts(req, res) {
         console.log("Cannot get carts with mongoose: ", error);
     }
 }
-
 
 export async function getCart(req, res) {
     const cartId = req.params.cid;
@@ -93,6 +92,19 @@ export async function addProductInCart(req, res) {
     } catch (error) {
         console.error('Error al agregar el producto:', error);
         res.status(500).json({ error: 'Error al agregar el producto' });
+    }
+}
+
+export async function addToCart(req, res) {
+    try {
+        const { productId } = req.params;
+        const { user } = req;
+
+        const cart = await CartService.addToCart(productId, user);
+
+        res.json(cart);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al agregar el producto al carrito.' });
     }
 }
 

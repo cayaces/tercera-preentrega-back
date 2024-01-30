@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const authorizeRole = (role) => {
@@ -25,4 +26,4 @@ const connectMongo = async () => {
     }
 }
 
-export  default { connectMongo, authorizeRole }
+export { connectMongo, authorizeRole }

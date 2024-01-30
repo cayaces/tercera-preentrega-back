@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { registerUser, loginUser, logoutUser, handleGitHubCallback } from "../controllers/users.controller.js";
+import { registerUser, loginUser, logoutUser, handleGitHubCallback, toggleUserRole } from "../controllers/users.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
 
 const UserRouter = express.Router()
@@ -82,6 +82,9 @@ UserRouter.get("/current", async (req, res) => {
         res.status(500).json(error);
     }
 })
+
+UserRouter.patch('/premium/:uid', toggleUserRole);
+
 
 export default UserRouter;
 

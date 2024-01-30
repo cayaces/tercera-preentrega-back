@@ -1,16 +1,16 @@
 import express from "express";
-import { getProducts, createProduct, deleteProduct, getProductById, getProductByLimit, getProductByPage, getProductByQuery, updateProduct } from "../controllers/products.controller.js";
+import { getProducts, deleteProduct, createProduct, getProductById, getProductByLimit, getProductByPage, getProductByQuery, updateProduct } from "../controllers/products.controller.js";
 
-const productsRouter = express.Router()
+const productRouter = express.Router()
 
-productsRouter.get("/", getProducts)
-productsRouter.get("/:pid", getProductById)
-productsRouter.post("/", createProduct)
-productsRouter.put("/:pid", updateProduct)
-productsRouter.delete("/:pid", deleteProduct)
-productsRouter.get("/limit/:limit", getProductByLimit)
-productsRouter.get("/page/:page", getProductByPage)
-productsRouter.get("/query/:query", getProductByQuery)
+productRouter.get("/", getProducts)
+productRouter.get("/:pid", getProductById)
+productRouter.post("/", createProduct)
+productRouter.put("/:pid", updateProduct)
+productRouter.delete("/:pid", deleteProduct)
+productRouter.get("/limit/:limit", getProductByLimit)
+productRouter.get("/page/:page", getProductByPage)
+productRouter.get("/query/:query", getProductByQuery)
+productRouter.delete('/:productId', deleteProduct);
 
-
-export default productsRouter;
+export default productRouter;

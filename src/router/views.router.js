@@ -1,7 +1,13 @@
+import __dirname from "../utils.js";
+import path from "path"
 import express from "express";
-import authorizeRole from "../config/auth.mongo.config.js";
+import { authorizeRole } from "../config/auth.mongo.config.js";
 
 const ViewsRouter = express.Router()
+
+ViewsRouter.get("/", async (req, res) => {
+    res.sendFile(path.join(__dirname, 'main.html'))
+})
 
 ViewsRouter.get("/inicio", async (req, res) => {
     res.render("inicio", {
@@ -26,5 +32,6 @@ ViewsRouter.get("/addProducts", authorizeRole("admin"), (req, res) => {
         title: "Agregar Productos"
     })
 })
+
 
 export default ViewsRouter

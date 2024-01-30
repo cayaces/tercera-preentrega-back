@@ -1,13 +1,30 @@
-import userModel from "../dao/mongo/user.model.js";
+import UserModel from "../dao/mongo/user.model.js";
 
-class UserRepository extends userModel {
+class UserRepository extends UserModel {
     constructor() {
         super();
     }
 
+    toggleUserRole = async (userId) => {
+        try {
+            const user = await this.findById(userId);
+
+            if (!user) {
+                return "Usuario no encontrado";
+            }
+            user.role = user.role === 'user' ? 'premium' : 'user';
+            await user.save();
+            return user;
+        } catch (error) {
+            console.error("Error al cambiar el rol del usuario en el repositorio: ", error);
+            return error;
+        }
+    };
+
+
     findUser = async (email) => {
         try {
-            const user = await userModel.findOne({ email }, { email: 1, password: 1, role: 1, name: 1, surname: 1 });
+            const user = await UserModel.findOne({ email }, { email: 1, password: 1, role: 1, name: 1, surname: 1 });
             if (!user) {
                 return "Usuario no encontrado";
             }
@@ -21,7 +38,7 @@ class UserRepository extends userModel {
 
     addUser = async (user) => {
         try {
-            const newUser = await userModel.create(user);
+            const newUser = await UserModel.create(user);
             return newUser;
 
         } catch (error) {
@@ -32,7 +49,7 @@ class UserRepository extends userModel {
 
     getUsers = async () => {
         try {
-            const users = await userModel.find();
+            const users = await UserModel.find();
             return users;
 
         } catch (error) {
@@ -43,7 +60,7 @@ class UserRepository extends userModel {
 
     getUserById = async (id) => {
         try {
-            const user = await userModel.findById(id);
+            const user = await UserModel.findById(id);
             return user;
 
         } catch (error) {
@@ -54,7 +71,7 @@ class UserRepository extends userModel {
 
     getUserByEmail = async (email) => {
         try {
-            const user = await userModel.findOne({ email: email });
+            const user = await UserModel.findOne({ email: email });
             return user;
 
         } catch (error) {
@@ -64,7 +81,7 @@ class UserRepository extends userModel {
 
     updateUser = async (id, user) => {
         try {
-            const updatedUser = await userModel.findByIdAndUpdate(id, user);
+            const updatedUser = await UserModel.findByIdAndUpdate(id, user);
             return updatedUser;
 
         } catch (error) {
@@ -75,7 +92,7 @@ class UserRepository extends userModel {
 
     deleteUser = async (id) => {
         try {
-            const deletedUser = await userModel.findByIdAndDelete(id);
+            const deletedUser = await UserModel.findByIdAndDelete(id);
             return deletedUser;
 
         } catch (error) {
@@ -86,7 +103,7 @@ class UserRepository extends userModel {
 
     validateUser = async (email, password) => {
         try {
-            const user = await userModel.findOne({ email: email, password: password });
+            const user = await UserModel.findOne({ email: email, password: password });
             return user;
 
         } catch (error) {
@@ -97,7 +114,7 @@ class UserRepository extends userModel {
 
     findEmail = async (param) => {
         try {
-            const email = await userModel.findOne(param);
+            const email = await UserModel.findOne(param);
             return email;
 
         } catch (error) {
