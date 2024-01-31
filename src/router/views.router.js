@@ -2,6 +2,8 @@ import __dirname from "../utils.js";
 import path from "path"
 import express from "express";
 import { authorizeRole } from "../config/auth.mongo.config.js";
+import { loginUser, registerUser } from '../controllers/users.controller.js';
+import { generateToken } from '../services/authJWTService.js';
 
 const ViewsRouter = express.Router()
 
@@ -32,6 +34,13 @@ ViewsRouter.get("/addProducts", authorizeRole("admin"), (req, res) => {
         title: "Agregar Productos"
     })
 })
+
+ViewsRouter.post('/login', loginUser)
+
+ViewsRouter.post('/register', registerUser, (req, res) => {
+    const token = generateToken(req.user);
+    res.json({ token });
+});
 
 
 export default ViewsRouter

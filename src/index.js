@@ -19,7 +19,7 @@ import { resetPasswordRouter } from "./router/nodemailer.router.js"
 //import UserService from "./services/UserService.js";
 //import { UserService } from "./services/UserService.js";
 //import { productRouter } from './router/product.router.js';
-
+import ProtectedRouter from "./router/authJWT.router.js"
 
 dotenv.config();
 
@@ -49,10 +49,8 @@ app.engine("handlebars", engine())
 app.set("view engine", "handlebars")
 app.set("views", path.resolve(__dirname + "/views"))
 
-
 //app.use("/", express.static(__dirname + "/public"))
 app.use("/", express.static(path.resolve(__dirname, "public")));
-
 
 app.use("/", resetPasswordRouter); 
 app.use("/recuperacion", recuperacionRouter);
@@ -63,3 +61,4 @@ app.use("/api/users", UserRouter)
 app.use("/api/carts", cartsRouter)
 app.use("/api/products", productsRouter)
 //app.use("/api/products", productRouter)
+app.use('/protected', ProtectedRouter);
